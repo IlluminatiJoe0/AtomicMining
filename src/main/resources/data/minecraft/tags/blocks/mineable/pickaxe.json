@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "atomicmining:atomic_miner",
+    "atomicmining:ender_block"
+  ]
+}

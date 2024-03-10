@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "atomicmining:block/ender_block"
+    }
+  }
+}

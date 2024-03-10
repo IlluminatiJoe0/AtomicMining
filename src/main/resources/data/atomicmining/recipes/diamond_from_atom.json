@@ -1,0 +1,11 @@
+{
+  "type": "atomicmining:atomic_mining",
+  "ingredients": [
+    {
+      "item": "atomicmining:diamond_atom"
+    }
+  ],
+  "output": {
+    "item": "minecraft:diamond"
+  }
+}

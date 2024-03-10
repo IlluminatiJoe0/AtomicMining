@@ -1,0 +1,11 @@
+{
+  "type": "atomicmining:atomic_mining",
+  "ingredients": [
+    {
+      "item": "minecraft:coal"
+    }
+  ],
+  "output": {
+    "item": "minecraft:diamond"
+  }
+}

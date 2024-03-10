@@ -1,0 +1,9 @@
+{
+  "item.atomicmining.diamond_atom": "Diamond Atom",
+  "item.atomicmining.atomic_collapser": "Atomic Collapser",
+
+  "creative_tab.atomic_mining_tab": "Atomic Mining",
+
+  "block.atomicmining.ender_block": "Block of Ender",
+  "block.atomicmining.atomic_miner": "Atomic Miner"
+}

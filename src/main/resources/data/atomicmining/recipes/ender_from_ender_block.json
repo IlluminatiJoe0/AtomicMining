@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "atomicmining:ender_block"
+    }
+  ],
+  "result": {
+    "item": "minecraft:ender_pearl",
+    "count": 9
+  }
+}
