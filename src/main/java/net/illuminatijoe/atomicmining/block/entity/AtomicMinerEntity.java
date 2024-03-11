@@ -1,11 +1,13 @@
 package net.illuminatijoe.atomicmining.block.entity;
 
+import com.sun.jna.platform.unix.X11;
 import net.illuminatijoe.atomicmining.AtomicMining;
 import net.illuminatijoe.atomicmining.block.ModBlocks;
 import net.illuminatijoe.atomicmining.block.custom.AtomicMiner;
 import net.illuminatijoe.atomicmining.item.ModItems;
 import net.illuminatijoe.atomicmining.recipe.AtomicMinerRecipe;
 import net.illuminatijoe.atomicmining.screen.AtomicMinerMenu;
+import net.illuminatijoe.atomicmining.util.ModEnergyStorage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,6 +31,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
@@ -49,24 +52,45 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
         @Override
         public boolean isItemValid(int slot, @NotNull ItemStack stack) {
             return switch (slot){
-                case 0 -> false;
-                case 1 -> stack.getItem() == ModItems.DIAMONDATOM.get();
+                case 0 -> true;
+                case 1 -> true;
                 case 2 -> false;
                 default -> super.isItemValid(slot, stack);
             };
         }
     };
 
+    private final ModEnergyStorage ENERGY_STORAGE = new ModEnergyStorage(1000000, 2048) {
+        @Override
+        public void onEnergyChanged() {
+            setChanged();
+
+        }
+    };
+
+    private static final int ENERGY_REQ = 1024;
+
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
+    private LazyOptional<IEnergyStorage> lazyEnergyHandler = LazyOptional.empty();
     private final Map<Direction, LazyOptional<WrappedHandler>> directionWrappedHandlerMap =
-            Map.of(Direction.DOWN, LazyOptional.of(() -> new WrappedHandler(itemStackHandler, (i) -> i == 2, (i, s) -> false)),
-                    Direction.NORTH, LazyOptional.of(() -> new WrappedHandler(itemStackHandler, (index) -> index == 1,
+            Map.of(Direction.DOWN, LazyOptional.of(() -> new WrappedHandler(itemStackHandler,
+                            (i) -> i == 2,
+                            (i, s) -> false)),
+                    Direction.NORTH, LazyOptional.of(() -> new WrappedHandler(itemStackHandler,
+                            (index) -> index == 1,
                             (index, stack) -> itemStackHandler.isItemValid(1, stack))),
-                    Direction.SOUTH, LazyOptional.of(() -> new WrappedHandler(itemStackHandler, (i) -> i == 2, (i, s) -> false)),
-                    Direction.EAST, LazyOptional.of(() -> new WrappedHandler(itemStackHandler, (i) -> i == 1,
+                    Direction.SOUTH, LazyOptional.of(() -> new WrappedHandler(itemStackHandler,
+                            (i) -> i == 2,
                             (index, stack) -> itemStackHandler.isItemValid(1, stack))),
-                    Direction.WEST, LazyOptional.of(() -> new WrappedHandler(itemStackHandler, (index) -> index == 0 || index == 1,
-                            (index, stack) -> itemStackHandler.isItemValid(0, stack) || itemStackHandler.isItemValid(1, stack))));
+                    Direction.EAST, LazyOptional.of(() -> new WrappedHandler(itemStackHandler,
+                            (i) -> i == 1,
+                            (index, stack) -> itemStackHandler.isItemValid(1, stack))),
+                    Direction.WEST, LazyOptional.of(() -> new WrappedHandler(itemStackHandler,
+                            (index) -> index == 0 || index == 1,
+                            (index, stack) -> itemStackHandler.isItemValid(0, stack) || itemStackHandler.isItemValid(1, stack))),
+                    Direction.UP, LazyOptional.of(() -> new WrappedHandler(itemStackHandler,
+                            (index) -> index == 1,
+                            (index, stack) -> itemStackHandler.isItemValid(1, stack))));
 
     protected final ContainerData data;
     private int progress = 0;
@@ -80,6 +104,8 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
                 return switch (index) {
                     case 0 -> AtomicMinerEntity.this.progress;
                     case 1 -> AtomicMinerEntity.this.maxProgress;
+                    case 2 -> AtomicMinerEntity.this.ENERGY_STORAGE.getEnergyStored();
+                    case 3 -> AtomicMinerEntity.this.ENERGY_STORAGE.getMaxEnergyStored();
                     default -> 0;
                 };
             }
@@ -89,12 +115,13 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
                 switch (index) {
                     case 0 -> AtomicMinerEntity.this.progress = value;
                     case 1 -> AtomicMinerEntity.this.maxProgress = value;
+                    case 2 -> AtomicMinerEntity.this.ENERGY_STORAGE.setEnergy(value);
                 }
             }
 
             @Override
             public int getCount() {
-                return 2;
+                return 4;
             }
         };
     }
@@ -112,6 +139,10 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        if(cap == ForgeCapabilities.ENERGY) {
+            return lazyEnergyHandler.cast();
+        }
+
         if (cap == ForgeCapabilities.ITEM_HANDLER) {
             if(side == null) {
                 return lazyItemHandler.cast();
@@ -140,18 +171,21 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
     public void onLoad() {
         super.onLoad();
         lazyItemHandler = LazyOptional.of(() -> itemStackHandler);
+        lazyEnergyHandler = LazyOptional.of(() -> ENERGY_STORAGE);
     }
 
     @Override
     public void invalidateCaps() {
         super.invalidateCaps();
         lazyItemHandler.invalidate();
+        lazyEnergyHandler.invalidate();
     }
 
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         pTag.put("inventory", itemStackHandler.serializeNBT());
         pTag.putInt("atomic_miner.progress", progress);
+        pTag.putInt("atomic_miner_energy", ENERGY_STORAGE.getEnergyStored());
 
         super.saveAdditional(pTag);
     }
@@ -159,8 +193,9 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
     @Override
     public void load(CompoundTag pTag) {
         super.load(pTag);
-        itemStackHandler.deserializeNBT(pTag.getCompound("inventory"));
+        itemStackHandler.deserializeNBT(pTag.getCompound("inventory "));
         progress = pTag.getInt("atomic_miner.progress");
+        ENERGY_STORAGE.setEnergy(pTag.getInt("atomic_miner_energy"));
     }
 
     public void drops() {
@@ -177,8 +212,13 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
             return;
         }
 
-        if (hasRecipe(atomicMinerEntity)) {
+        if(hasCoalInFirstSlot(atomicMinerEntity)) {
+            atomicMinerEntity.ENERGY_STORAGE.receiveEnergy(64, false);
+        }
+
+        if (hasRecipe(atomicMinerEntity) && hasEnergy(atomicMinerEntity)) {
             atomicMinerEntity.progress++;
+            extractEnergy(atomicMinerEntity);
             setChanged(level, blockPos, blockState);
 
             if(atomicMinerEntity.progress >= atomicMinerEntity.maxProgress){
@@ -189,6 +229,18 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
             setChanged(level, blockPos, blockState);
         }
 
+    }
+
+    private static void extractEnergy(AtomicMinerEntity atomicMinerEntity) {
+        atomicMinerEntity.ENERGY_STORAGE.extractEnergy(ENERGY_REQ, false);
+    }
+
+    private static boolean hasEnergy(AtomicMinerEntity atomicMinerEntity) {
+        return atomicMinerEntity.ENERGY_STORAGE.getEnergyStored() >= ENERGY_REQ * atomicMinerEntity.maxProgress;
+    }
+
+    private static boolean hasCoalInFirstSlot(AtomicMinerEntity atomicMinerEntity) {
+        return (atomicMinerEntity.itemStackHandler.getStackInSlot(0).getItem() == Items.COAL.asItem()) || (atomicMinerEntity.itemStackHandler.getStackInSlot(0).getItem() == Items.COAL_BLOCK.asItem());
     }
 
     private void resetProgress() {

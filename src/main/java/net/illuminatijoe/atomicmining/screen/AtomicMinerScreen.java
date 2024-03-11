@@ -36,6 +36,15 @@ public class AtomicMinerScreen extends AbstractContainerScreen<AtomicMinerMenu> 
         guiGraphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
 
         renderProgressArrow(guiGraphics, x, y);
+
+        int energyScaled = this.menu.getEnergyStoredScaled();
+
+        //background
+        guiGraphics.fill(this.leftPos + 156,
+                this.topPos + 16 + (61 - energyScaled),
+                this.leftPos + 164,
+                this.topPos + 77,
+                0xAACC2222);
     }
 
     private void renderProgressArrow(GuiGraphics guiGraphics, int x, int y) {
@@ -49,5 +58,13 @@ public class AtomicMinerScreen extends AbstractContainerScreen<AtomicMinerMenu> 
         renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, delta);
         renderTooltip(guiGraphics, mouseX, mouseY);
+
+        int energyStored = this.menu.getEnergy();
+        int maxEnergyStored = this.menu.getMaxEnergy();
+
+        Component text = Component.literal("Energy: " + energyStored+ " / " + maxEnergyStored);
+        if(isHovering(150, 12, 16, 66, mouseX, mouseY)) {
+            guiGraphics.renderTooltip(this.font, text, mouseX, mouseY);
+        }
     }
 }

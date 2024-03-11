@@ -1,5 +1,16 @@
 {
   "item.atomicmining.diamond_atom": "Diamond Atom",
+  "item.atomicmining.coal_atom": "Coal Atom",
+  "item.atomicmining.emerald_atom": "Emerald Atom",
+  "item.atomicmining.gold_atom": "Gold Atom",
+  "item.atomicmining.iron_atom": "Iron Atom",
+  "item.atomicmining.lapis_atom": "Lapis Lazuli Atom",
+  "item.atomicmining.netherite_atom": "Netherite Scrap Atom",
+  "item.atomicmining.nether_star_atom": "Nether Star Atom",
+  "item.atomicmining.quartz_atom": "Nether Quartz Atom",
+  "item.atomicmining.redstone_atom": "Redstone Atom",
+  "item.atomicmining.copper_atom": "Copper Atom",
+
   "item.atomicmining.atomic_collapser": "Atomic Collapser",
 
   "creative_tab.atomic_mining_tab": "Atomic Mining",

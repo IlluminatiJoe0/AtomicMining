@@ -18,10 +18,12 @@ public class AtomicMinerMenu extends AbstractContainerMenu {
     private final Level level;
     private final ContainerData data;
 
+    //Client Constructor
     public AtomicMinerMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
-        this(id, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(2));
+        this(id, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(4));
     }
 
+    // Server Constructor
     public AtomicMinerMenu(int id, Inventory inv, BlockEntity entity, ContainerData data) {
         super(ModMenuTypes.ATOMIC_MINER_MENU.get(), id);
         checkContainerSize(inv, 3);
@@ -122,5 +124,17 @@ public class AtomicMinerMenu extends AbstractContainerMenu {
         for (int i = 0; i < 9; ++i) {
             this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 144));
         }
+    }
+
+    public int getEnergy() {
+        return this.data.get(2);
+    }
+
+    public int getMaxEnergy() {
+        return this.data.get(3);
+    }
+
+    public int getEnergyStoredScaled(){
+        return (int) ((float) getEnergy() / (float) getMaxEnergy() * 64);
     }
 }
