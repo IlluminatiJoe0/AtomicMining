@@ -17,6 +17,7 @@ import java.util.Objects;
 @JeiPlugin
 public class JEIAtomicMiningAddon implements IModPlugin {
 
+
     public static RecipeType<AtomicMinerRecipe> MININGTYPE =
             new RecipeType<>(AtomicMinerRecipeCategory.UID, AtomicMinerRecipe.class);
 
