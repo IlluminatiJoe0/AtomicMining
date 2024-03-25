@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": {
+      "item": "minecraft:quartz_block"
+    },
+    "X": {
+      "item": "atomicmining:atomic_collapser"
+    }
+  },
+  "pattern": [
+    "###",
+    "#X#",
+    "###"
+  ],
+  "result": {
+    "item": "atomicmining:quartz_atom"
+  }
+}
