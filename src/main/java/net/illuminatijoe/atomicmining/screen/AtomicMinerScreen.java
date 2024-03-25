@@ -22,7 +22,7 @@ public class AtomicMinerScreen extends AbstractContainerScreen<AtomicMinerMenu> 
     protected void init() {
         super.init();
         this.inventoryLabelY = 10000;
-        this.titleLabelY = 10000;
+        this.titleLabelY = 5;
     }
 
     @Override

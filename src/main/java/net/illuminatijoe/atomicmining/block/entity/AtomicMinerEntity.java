@@ -44,7 +44,7 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
         @Override
         public boolean isItemValid(int slot, @NotNull ItemStack stack) {
             return switch (slot){
-                case 0 -> stack.getItem() == ModItems.SPEEDUPGRADE.get();
+                case 0 -> (stack.getItem() == ModItems.SPEEDUPGRADE.get()) && (getStackInSlot(slot).getCount() < 1);
                 case 1 -> true;
                 case 2 -> false;
                 default -> super.isItemValid(slot, stack);

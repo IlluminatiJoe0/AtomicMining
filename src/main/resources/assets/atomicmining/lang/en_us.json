@@ -19,5 +19,6 @@
   "block.atomicmining.ender_block": "Block of Ender",
   "block.atomicmining.atomic_miner": "Atomic Miner",
 
-  "tooltip.atomicmining.speed_upgrade.tooltip": "§7Doubles the speed of the Atomic Miner"
+  "tooltip.atomicmining.speed_upgrade.tooltip": "§7Doubles the speed of the Atomic Miner\nSubsequent upgrades give no effect",
+  "tooltip.atomicmining.atomic_miner.tooltip": "§7Mines valuables from their respective atoms\nConsumes§c 1024 FE/t§7\nCan be upgraded using Speed Upgrades"
 }
