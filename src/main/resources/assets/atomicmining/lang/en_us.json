@@ -10,11 +10,14 @@
   "item.atomicmining.quartz_atom": "Nether Quartz Atom",
   "item.atomicmining.redstone_atom": "Redstone Atom",
   "item.atomicmining.copper_atom": "Copper Atom",
+  "item.atomicmining.speed_upgrade": "Speed Upgrade",
 
   "item.atomicmining.atomic_collapser": "Atomic Collapser",
 
   "creative_tab.atomic_mining_tab": "Atomic Mining",
 
   "block.atomicmining.ender_block": "Block of Ender",
-  "block.atomicmining.atomic_miner": "Atomic Miner"
+  "block.atomicmining.atomic_miner": "Atomic Miner",
+
+  "tooltip.atomicmining.speed_upgrade.tooltip": "§7Doubles the speed of the Atomic Miner"
 }

@@ -1,6 +1,7 @@
 package net.illuminatijoe.atomicmining.item;
 
 import net.illuminatijoe.atomicmining.AtomicMining;
+import net.illuminatijoe.atomicmining.block.custom.SpeedUpgradeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -38,6 +39,8 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> COPPERATOM = ITEMS.register("copper_atom",
             () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> SPEEDUPGRADE = ITEMS.register("speed_upgrade",
+            () -> new SpeedUpgradeItem(new Item.Properties()));
 
 
     public static void register(IEventBus eventBus) {

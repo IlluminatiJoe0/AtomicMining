@@ -1,18 +1,13 @@
 package net.illuminatijoe.atomicmining.block.entity;
 
-import com.sun.jna.platform.unix.X11;
-import net.illuminatijoe.atomicmining.AtomicMining;
-import net.illuminatijoe.atomicmining.block.ModBlocks;
 import net.illuminatijoe.atomicmining.block.custom.AtomicMiner;
 import net.illuminatijoe.atomicmining.item.ModItems;
 import net.illuminatijoe.atomicmining.recipe.AtomicMinerRecipe;
 import net.illuminatijoe.atomicmining.screen.AtomicMinerMenu;
 import net.illuminatijoe.atomicmining.util.ModEnergyStorage;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.CompressionEncoder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -21,12 +16,10 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -37,7 +30,6 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.plaf.basic.BasicComboBoxUI;
 import java.util.Map;
 import java.util.Optional;
 
@@ -52,7 +44,7 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
         @Override
         public boolean isItemValid(int slot, @NotNull ItemStack stack) {
             return switch (slot){
-                case 0 -> true;
+                case 0 -> stack.getItem() == ModItems.SPEEDUPGRADE.get();
                 case 1 -> true;
                 case 2 -> false;
                 default -> super.isItemValid(slot, stack);
@@ -77,19 +69,19 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
                             (i) -> i == 2,
                             (i, s) -> false)),
                     Direction.NORTH, LazyOptional.of(() -> new WrappedHandler(itemStackHandler,
-                            (index) -> index == 1,
+                            (index) -> index == 2,
                             (index, stack) -> itemStackHandler.isItemValid(1, stack))),
                     Direction.SOUTH, LazyOptional.of(() -> new WrappedHandler(itemStackHandler,
                             (i) -> i == 2,
                             (index, stack) -> itemStackHandler.isItemValid(1, stack))),
                     Direction.EAST, LazyOptional.of(() -> new WrappedHandler(itemStackHandler,
-                            (i) -> i == 1,
+                            (i) -> i == 2,
                             (index, stack) -> itemStackHandler.isItemValid(1, stack))),
                     Direction.WEST, LazyOptional.of(() -> new WrappedHandler(itemStackHandler,
-                            (index) -> index == 0 || index == 1,
-                            (index, stack) -> itemStackHandler.isItemValid(0, stack) || itemStackHandler.isItemValid(1, stack))),
+                            (index) -> index == 2,
+                            (index, stack) -> itemStackHandler.isItemValid(1, stack))),
                     Direction.UP, LazyOptional.of(() -> new WrappedHandler(itemStackHandler,
-                            (index) -> index == 1,
+                            (index) -> index == 2,
                             (index, stack) -> itemStackHandler.isItemValid(1, stack))));
 
     protected final ContainerData data;
@@ -212,12 +204,9 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
             return;
         }
 
-        if(hasCoalInFirstSlot(atomicMinerEntity)) {
-            atomicMinerEntity.ENERGY_STORAGE.receiveEnergy(64, false);
-        }
 
         if (hasRecipe(atomicMinerEntity) && hasEnergy(atomicMinerEntity)) {
-            atomicMinerEntity.progress++;
+            atomicMinerEntity.progress = atomicMinerEntity.progress + (hasUpgrade(atomicMinerEntity) ? 2 : 1);
             extractEnergy(atomicMinerEntity);
             setChanged(level, blockPos, blockState);
 
@@ -239,8 +228,8 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
         return atomicMinerEntity.ENERGY_STORAGE.getEnergyStored() >= ENERGY_REQ * atomicMinerEntity.maxProgress;
     }
 
-    private static boolean hasCoalInFirstSlot(AtomicMinerEntity atomicMinerEntity) {
-        return (atomicMinerEntity.itemStackHandler.getStackInSlot(0).getItem() == Items.COAL.asItem()) || (atomicMinerEntity.itemStackHandler.getStackInSlot(0).getItem() == Items.COAL_BLOCK.asItem());
+    private static boolean hasUpgrade(AtomicMinerEntity atomicMinerEntity) {
+        return (atomicMinerEntity.itemStackHandler.getStackInSlot(0).getItem() == ModItems.SPEEDUPGRADE.get());
     }
 
     private void resetProgress() {
