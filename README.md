@@ -7,6 +7,8 @@ Atomic Mining is a simple, late game mod that allows you to passively generate o
 > [!NOTE]
 > The Atomic Miner requires power, but this mod does not have a power generation method.
 
+<h2>How to generate ores?</h2>
+Craft the Atomic Miner and some atoms of your choice. Place down the Atomic Miner, put one atom into it, and power it. You got infinite ores now!
 <h2>License</h2>
 MIT License
 
