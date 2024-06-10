@@ -17,7 +17,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -119,13 +118,13 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public Component getDisplayName() {
+    public @NotNull Component getDisplayName() {
         return Component.literal("Atomic Miner");
     }
 
     @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
+    public AbstractContainerMenu createMenu(int i, @NotNull Inventory inventory, @NotNull Player player) {
         return new AtomicMinerMenu(i, inventory, this, this.data);
     }
 
@@ -183,7 +182,7 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public void load(CompoundTag pTag) {
+    public void load(@NotNull CompoundTag pTag) {
         super.load(pTag);
         itemStackHandler.deserializeNBT(pTag.getCompound("inventory "));
         progress = pTag.getInt("atomic_miner.progress");
@@ -203,7 +202,6 @@ public class AtomicMinerEntity extends BlockEntity implements MenuProvider {
         if(level.isClientSide()) {
             return;
         }
-
 
         if (hasRecipe(atomicMinerEntity) && hasEnergy(atomicMinerEntity)) {
             atomicMinerEntity.progress = atomicMinerEntity.progress + (hasUpgrade(atomicMinerEntity) ? 2 : 1);

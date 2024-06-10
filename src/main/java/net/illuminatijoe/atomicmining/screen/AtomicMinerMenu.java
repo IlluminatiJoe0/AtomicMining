@@ -11,7 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.SlotItemHandler;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 public class AtomicMinerMenu extends AbstractContainerMenu {
     public final AtomicMinerEntity blockEntity;
@@ -35,7 +35,24 @@ public class AtomicMinerMenu extends AbstractContainerMenu {
         addPlayerHotbar(inv);
 
         this.blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
-            this.addSlot(new SlotItemHandler(iItemHandler, 0, 12, 15));
+            this.addSlot(new SlotItemHandler(iItemHandler, 0, 12, 15) {
+                @Override
+                public int getMaxStackSize() {
+                    return 1;
+                }
+
+                @Override
+                public int getMaxStackSize(@NotNull ItemStack stack) {
+                    return 1;
+                }
+
+                @Override
+                public void set(@NotNull ItemStack stack) {
+                    ItemStack copiedItemStack = stack.copyWithCount(1);
+                    super.set(copiedItemStack);
+                    return;
+                }
+            });
             this.addSlot(new SlotItemHandler(iItemHandler, 1, 86, 15));
             this.addSlot(new SlotItemHandler(iItemHandler, 2, 86, 60));
         });
